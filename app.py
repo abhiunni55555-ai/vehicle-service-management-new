@@ -15,11 +15,11 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "change-this-secret-key")
 
 # Connect to your EXISTING PostgreSQL database
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "dbname": "vehicle_service_db",
-    "user": "postgres",
-    "password": os.environ.get("DB_PASSWORD", "")
+    "host": os.environ["DB_HOST"],
+    "port":  os.environ["DB_PORT"],
+    "dbname": os.environ["DB_NAME"],
+    "user": os.environ["DB_USER"],
+    "password": os.environ["DB_PASSWORD"]
 }
 
 # Existing tables and their primary keys
