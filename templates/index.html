@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Service Management System</title>
+  <style>
+    :root {
+      --navy: #12345a;
+      --blue: #1d4ed8;
+      --light-blue: #eaf2ff;
+      --bg: #f4f7fb;
+      --text: #243247;
+      --muted: #6b7a90;
+      --border: #dce5f0;
+      --white: #fff;
+      --green: #15803d;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
+    aside {
+      width: 245px; background: var(--navy); color: white; padding: 24px 15px;
+      flex-shrink: 0;
+    }
+    .brand { font-size: 19px; font-weight: 700; line-height: 1.35; padding: 0 12px 25px; }
+    .brand span { display: block; font-size: 12px; color: #bdd5f8; font-weight: 400; margin-top: 5px; }
+    .nav-label { padding: 12px; color: #a9c2e6; font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; }
+    .nav-btn {
+      display: block; width: 100%; text-align: left; padding: 12px 13px; margin: 3px 0;
+      color: #e7efff; border: 0; border-radius: 8px; background: transparent; cursor: pointer;
+      font-size: 14px;
+    }
+    .nav-btn:hover, .nav-btn.active { background: #244d7d; color: white; }
+    main { flex: 1; min-width: 0; }
+    header {
+      background: white; border-bottom: 1px solid var(--border); padding: 19px 28px;
+      display: flex; justify-content: space-between; align-items: center; gap: 15px;
+    }
+    header h1 { margin: 0; font-size: 22px; color: var(--navy); }
+    header p { margin: 5px 0 0; font-size: 13px; color: var(--muted); }
+    .admin { background: var(--light-blue); color: var(--navy); border-radius: 25px; padding: 10px 13px; font-size: 13px; white-space: nowrap; }
+    .content { padding: 26px 28px; max-width: 1500px; margin: auto; }
+    .welcome { margin-bottom: 22px; }
+    .welcome h2 { margin: 0 0 7px; font-size: 24px; color: var(--navy); }
+    .welcome p { margin: 0; color: var(--muted); }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 3px 12px #18365a08; }
+    .card .label { color: var(--muted); font-size: 13px; }
+    .card .value { color: var(--navy); font-size: 29px; font-weight: 700; margin-top: 10px; }
+    .card .icon { float: right; background: var(--light-blue); border-radius: 9px; padding: 9px; font-size: 20px; }
+    .panel { background: white; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+    .panel-head { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .panel-head h3 { margin: 0; color: var(--navy); font-size: 17px; }
+    .panel-body { padding: 20px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 12px; }
+    .quick-btn { padding: 16px; background: #f8fbff; border: 1px solid var(--border); border-radius: 9px; cursor: pointer; text-align: left; color: var(--navy); font-weight: 700; }
+    .quick-btn span { display: block; color: var(--muted); font-weight: 400; font-size: 12px; margin-top: 7px; }
+    .quick-btn:hover { border-color: #8bb6ff; background: var(--light-blue); }
+    .form-grid { display: grid; grid-template-columns: repeat(3, minmax(160px, 1fr)); gap: 15px; }
+    .field label { display: block; margin-bottom: 7px; color: #40516a; font-size: 13px; font-weight: 700; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 11px 12px; border: 1px solid #cbd5e1; border-radius: 7px;
+      background: white; color: var(--text); font-size: 14px;
+    }
+    .field textarea { min-height: 42px; resize: vertical; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .btn { border: 0; border-radius: 7px; padding: 11px 17px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-secondary { background: #e8eef7; color: var(--navy); }
+    .btn:hover { opacity: .9; }m
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th, td { text-align: left; padding: 13px 16px; border-bottom: 1px solid #edf1f6; font-size: 13px; }
+    th { color: #53647c; background: #f8faff; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+    .badge { display: inline-block; border-radius: 20px; padding: 5px 9px; background: #dcfce7; color: var(--green); font-size: 11px; font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .notice { padding: 13px 15px; background: #fff7df; border: 1px solid #f5dfa1; border-radius: 8px; color: #765719; font-size: 13px; line-height: 1.5; margin-top: 16px; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .empty { padding: 25px; text-align: center; color: var(--muted); }
+    footer { text-align: center; color: #8a97a9; font-size: 12px; padding: 18px; }
+    @media (max-width: 1000px) {
+      .cards { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .quick-grid { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+      .form-grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      aside { width: 210px; }
+    }
+    @media (max-width: 650px) {
+      .layout { display: block; }
+      aside { width: 100%; padding: 15px; }
+      .brand { padding: 0 8px 12px; }
+      .nav-label { padding: 8px; }
+      .nav-btn { display: inline-block; width: auto; margin: 2px; padding: 9px 11px; }
+      header { padding: 16px; }
+      header h1 { font-size: 18px; }
+      .content { padding: 17px 13px; }
+      .cards { gap: 10px; }
+      .card { padding: 15px; }
+      .card .value { font-size: 24px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .admin { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand">🚗 Vehicle Service<span>Management System</span></div>
+    <div class="nav-label">Main Menu</div>
+    <button class="nav-btn active" data-section="dashboard">▦ &nbsp; Dashboard</button>
+    <button class="nav-btn" data-section="customers">♙ &nbsp; Customers</button>
+    <button class="nav-btn" data-section="vehicles">🚘 &nbsp; Vehicles</button>
+    <button class="nav-btn" data-section="services">🔧 &nbsp; Services</button>
+    <button class="nav-btn" data-section="bookings">▣ &nbsp; Service Bookings</button>
+    <button class="nav-btn" data-section="mechanics">⚙ &nbsp; Mechanics</button>
+    <button class="nav-btn" data-section="parts">🔩 &nbsp; Spare Parts</button>
+    <button class="nav-btn" data-section="bills">🧾 &nbsp; Bills</button>
+    <button class="nav-btn" data-section="payments">💳 &nbsp; Payments</button>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <h1 id="page-title">Dashboard</h1>
+        <p>Manage customers, vehicles, bookings and payments in one place.</p>
+      </div>
+      <div class="admin">● &nbsp; Admin Panel</div>
+    </header>
+
+    <div class="content">
+      <section class="section active" id="dashboard">
+        <div class="welcome">
+          <h2>Welcome to your workshop</h2>
+        </div>
+        <div class="cards">
+          <div class="card"><span class="icon">♙</span><div class="label">Customers</div><div class="value" id="count-customers">0</div></div >
+          <div class="card"><span class="icon">🚘</span><div class="label">Vehicles</div><div class="value" id="count-vehicles">0</div></div>
+          <div class="card"><span class="icon">▣</span><div class="label">Bookings</div><div class="value" id="count-bookings">0</div></div>
+          <div class="card"><span class="icon">🧾</span><div class="label">Bills</div><div class="value" id="count-bills">0</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Quick Access</h3></div>
+          <div class="panel-body">
+            <div class="quick-grid">
+              <button class="quick-btn" data-go="customers">♙ Customers<span>Add and view customer details</span></button>
+              <button class="quick-btn" data-go="vehicles">🚘 Vehicles<span>Registration and model details</span></button>
+              <button class="quick-btn" data-go="bookings">▣ Service Bookings<span>Schedule and track service</span></button>
+              <button class="quick-btn" data-go="payments">💳 Payments<span>Payment method and status</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="customers">
+        <div class="panel">
+          <div class="panel-head"><h3>Customer Details</h3><span class="muted">CUSTOMER</span></div>
+          <div class="panel-body">
+            <form data-entity="customers">
+              <div class="form-grid">
+                <div class="field"><label>Customer ID</label><input name="id" placeholder="e.g. CUST001" required></div>
+                <div class="field"><label>Customer Name</label><input name="name" placeholder="Full name" required></div>
+                <div class="field"><label>Phone</label><input name="phone" type="tel" placeholder="Phone number"></div>
+                <div class="field"><label>Email</label><input name="email" type="email" placeholder="name@example.com"></div>
+                <div class="field"><label>Address</label><input name="address" placeholder="Customer address"></div>
+              </div>
+              <div class="actions"><button class="btn btn-primary" type="submit">Add Customer</button><button class="btn btn-secondary" type="reset">Clear</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="panel"><div class="panel-head"><h3>Customer Records</h3></div><div class="table-wrap"><table><thead><tr><th>Customer ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th></tr></thead><tbody id="table-customers"><tr><td colspan="5" class="empty">No records added yet.</td></tr></tbody></table></div></div>
+      </section>
+
+     <section class="section" id="vehicles">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Vehicle Details</h3>
+      <span class="muted">VEHICLE</span>
+    </div>
+    <div class="panel-body">
+      <form data-entity="vehicles">
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Customer ID</label>
+            <input name="customer_id" type="number"
+                   placeholder="Existing Customer ID" required>
+          </div>
+
+          <div class="field">
+            <label>Registration Number</label>
+            <input name="vehicle_number"
+                   placeholder="KL 00 AB 0000" required>
+          </div>
+
+          <div class="field">
+            <label>Brand</label>
+            <input name="brand" placeholder="Brand">
+          </div>
+
+          <div class="field">
+            <label>Model</label>
+            <input name="model" placeholder="Vehicle model">
+          </div>
+
+          <div class="field">
+            <label>Manufacture Year</label>
+            <input name="manufacture_year" type="number"
+                   placeholder="year" required>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Add Vehicle</button>
+          <button class="btn btn-secondary" type="reset">Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h3>Vehicle Records</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Vehicle ID</th>
+            <th>Customer ID</th>
+            <th>Registration Number</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Manufacture Year</th>
+          </tr>
+        </thead>
+        <tbody id="table-vehicles">
+          <tr><td colspan="6" class="empty">No records added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+      <section class="section" id="services">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Service Details</h3>
+      <span class="muted">SERVICE</span>
+    </div>
+
+    <div class="panel-body">
+      <form data-entity="services">
+        <div class="form-grid">
+          <div class="field">
+             <label>Service ID</label>
+            <input type="number"
+                  placeholder="Automatically generated"
+                  disabled>
+    </div>
+
+          <div class="field">
+            <label>Service Name</label>
+            <input name="name"
+                   placeholder="Enter service name"
+                   required>
+          </div>
+
+          <div class="field">
+            <label>Service Cost (₹)</label>
+            <input name="cost"
+                   type="number"
+                   min="0"
+                   step="0.01"
+                   placeholder="Enter service cost"
+                   required>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">
+            Add Service
+          </button>
+          <button class="btn btn-secondary" type="reset">
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Service Records</h3>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Service ID</th>
+            <th>Service Name</th>
+            <th>Service Cost (₹)</th>
+          </tr>
+        </thead>
+
+        <tbody id="table-services">
+          <tr>
+            <td colspan="3" class="empty">
+              No records added yet.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+     <section class="section" id="bookings">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Service Booking Details</h3>
+      <span class="muted">SERVICE BOOKING</span>
+    </div>
+    <div class="panel-body">
+      <form data-entity="bookings">
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Vehicle ID</label>
+            <input name="vehicle_id" type="number"
+                   placeholder="Existing Vehicle ID" required>
+          </div>
+
+          <div class="field">
+            <label>Service ID</label>
+            <input name="service_id" type="number"
+                   placeholder="Existing Service ID" required>
+          </div>
+
+          <div class="field">
+            <label>Mechanic ID</label>
+            <input name="mechanic_id" type="number"
+                   placeholder="Existing Mechanic ID">
+          </div>
+
+          <div class="field">
+            <label>Booking Date</label>
+            <input name="booking_date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label>Status</label>
+            <select name="status">
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Add Booking</button>
+          <button class="btn btn-secondary" type="reset">Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h3>Booking Records</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Vehicle ID</th>
+            <th>Service ID</th>
+            <th>Mechanic ID</th>
+            <th>Booking Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="table-bookings">
+          <tr><td colspan="6" class="empty">No records added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+      <section class="section" id="mechanics">
+        <div class="panel"><div class="panel-head"><h3>Mechanic Details</h3><span class="muted">MECHANIC</span></div><div class="panel-body">
+          <form data-entity="mechanics"><div class="form-grid">
+            <div class="field"><label>Mechanic ID</label><input name="id" placeholder="e.g. MEC001" required></div>
+            <div class="field"><label>Name</label><input name="name" placeholder="Mechanic name" required></div>
+            <div class="field"><label>Phone</label><input name="phone" type="tel" placeholder="Phone number"></div>
+            <div class="field"><label>Specialization</label><input name="specialization" placeholder="Engine, electrical, etc."></div>
+          </div><div class="actions"><button class="btn btn-primary" type="submit">Add Mechanic</button><button class="btn btn-secondary" type="reset">Clear</button></div></form>
+        </div></div>
+        <div class="panel"><div class="panel-head"><h3>Mechanic Records</h3></div><div class="table-wrap"><table><thead><tr><th>Mechanic ID</th><th>Name</th><th>Phone</th><th>Specialization</th></tr></thead><tbody id="table-mechanics"><tr><td colspan="4" class="empty">No records added yet.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="section" id="parts">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Spare Part Details</h3>
+      <span class="muted">SPARE PART</span>
+    </div>
+    <div class="panel-body">
+      <form data-entity="parts">
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Part Name</label>
+            <input name="part_name"
+                   placeholder="name" required>
+          </div>
+
+          <div class="field">
+            <label>Quantity</label>
+            <input name="quantity" type="number"
+                   min="0" placeholder="quantity" required>
+          </div>
+
+          <div class="field">
+            <label>Price (₹)</label>
+            <input name="price" type="number"
+                   min="0" step="0.01" placeholder="price" required>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Add Spare Part</button>
+          <button class="btn btn-secondary" type="reset">Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h3>Spare Part Records</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Part ID</th>
+            <th>Part Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody id="table-parts">
+          <tr><td colspan="4" class="empty">No records added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="section" id="bills">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Bill Details</h3>
+      <span class="muted">BILL</span>
+    </div>
+    <div class="panel-body">
+      <form data-entity="bills">
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Booking ID</label>
+            <input name="booking_id" type="number"
+                   placeholder="Existing Booking ID" required>
+          </div>
+
+          <div class="field">
+            <label>Bill Date</label>
+            <input name="bill_date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label>Total Amount (₹)</label>
+            <input name="total_amount" type="number"
+                   min="0" step="0.01"
+                   placeholder="1500" required>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Generate Bill</button>
+          <button class="btn btn-secondary" type="reset">Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h3>Bill Records</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Bill ID</th>
+            <th>Booking ID</th>
+            <th>Bill Date</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody id="table-bills">
+          <tr><td colspan="4" class="empty">No records added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+     <section class="section" id="payments">
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Payment Details</h3>
+      <span class="muted">PAYMENT</span>
+    </div>
+    <div class="panel-body">
+      <form data-entity="payments">
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Bill ID</label>
+            <input name="bill_id" type="number"
+                   placeholder="Existing Bill ID" required>
+          </div>
+
+          <div class="field">
+            <label>Payment Date</label>
+            <input name="payment_date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label>Amount (₹)</label>
+            <input name="amount" type="number"
+                   min="0" step="0.01"
+                   placeholder="1500" required>
+          </div>
+
+          <div class="field">
+            <label>Payment Method</label>
+            <select name="payment_method">
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Debit/Credit Card">Debit/Credit Card</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Add Payment</button>
+          <button class="btn btn-secondary" type="reset">Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h3>Payment Records</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Bill ID</th>
+            <th>Payment Date</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+          </tr>
+        </thead>
+        <tbody id="table-payments">
+          <tr><td colspan="5" class="empty">No records added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+     
+      <footer>Vehicle Service Management System</footer>
+    </div>
+  </main>
+</div>
+<script>
+  const titles = {
+    dashboard: "Dashboard", customers: "Customers", vehicles: "Vehicles",
+    services: "Services", bookings: "Service Bookings", mechanics: "Mechanics",
+    parts: "Spare Parts", bills: "Bills", payments: "Payments"
+  };
+  const records = {
+    customers: [], vehicles: [], services: [], bookings: [],
+    mechanics: [], parts: [], bills: [], payments: []
+  };
+  const columns = {
+    customers: [
+        "customer_id",
+        "customer_name",
+        "phone",
+        "email",
+        "address"
+    ],
+
+    vehicles: [
+        "vehicle_id",
+        "customer_id",
+        "vehicle_number",
+        "brand",
+        "model",
+        "manufacture_year"
+    ],
+
+    services: ["service_id",
+        "service_name",
+        "service_cost"
+    ],
+
+    bookings: [
+        "booking_id",
+        "vehicle_id",
+        "service_id",
+        "mechanic_id",
+        "booking_date",
+        "status"
+    ],
+
+    mechanics: [
+        "mechanic_id",
+        "mechanic_name",
+        "phone",
+        "specialization"
+    ],
+
+    parts: [
+        "part_id",
+        "part_name",
+        "quantity",
+        "price"
+    ],
+
+    bills: [
+        "bill_id",
+        "booking_id",
+        "bill_date",
+        "total_amount"
+    ],
+
+    payments: [
+        "payment_id",
+        "bill_id",
+        "payment_date",
+        "amount",
+        "payment_method"
+    ]
+};
+
+  function showSection(id) {
+    document.querySelectorAll(".section").forEach(s =>
+        s.classList.toggle("active", s.id === id)
+    );
+
+    document.querySelectorAll(".nav-btn").forEach(b =>
+        b.classList.toggle("active", b.dataset.section === id)
+    );
+
+    document.getElementById("page-title").textContent =
+        titles[id] || "Dashboard";
+
+    // Automatically load existing database records
+    if (id !== "dashboard") {
+        loadTable(id);
+    } else {
+        loadDashboardStats();
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+  
+  document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", () => showSection(btn.dataset.section)));
+  document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => showSection(btn.dataset.go)));
+
+  function safeCell(value) {
+    const td = document.createElement("td");
+    td.textContent = value === undefined || value === null ? "" : value;
+    return td;
+  }
+  function render(entity) {
+    const tbody = document.getElementById("table-" + entity);
+    tbody.replaceChildren();
+    if (!records[entity].length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = columns[entity].length;
+      td.className = "empty";
+      td.textContent = "No records added yet.";
+      tr.appendChild(td); tbody.appendChild(tr); return;
+    }
+    records[entity].forEach(record => {
+      const tr = document.createElement("tr");
+      columns[entity].forEach(key => tr.appendChild(safeCell(key === "total" ? "₹ " + record[key] : record[key])));
+      tbody.appendChild(tr);
+    });
+  }
+  document.querySelectorAll('form[data-entity]').forEach(form => {
+form.addEventListener('submit', async event => {
+event.preventDefault();
+
+    const entity = form.dataset.entity;
+    const data = Object.fromEntries(
+    [...new FormData(form).entries()].map(([key, value]) => [
+        key.replace(/[A-Z]/g, letter => "_" + letter.toLowerCase()),
+        value
+    ])
+);
+    try {
+        const apiTableNames = {
+    customers: 'customers',
+    vehicles: 'vehicles',
+    services: 'services',
+    bookings: 'service_bookings',
+    mechanics: 'mechanics',
+    parts: 'spare_parts',
+    bills: 'bills',
+    payments: 'payments'
+};
+
+const response = await fetch(`/api/${apiTableNames[entity]}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.error || 'Could not save record.');
+            return;
+        }
+
+        alert('Record saved successfully to PostgreSQL!');
+        form.reset();
+
+        await loadTable(entity);
+        await loadDashboardStats();
+    } catch (error) {
+        console.error(error);
+        alert('Could not connect to the server.');
+    }
+});
+
+});
+  function updateCounts() {
+    ["customers", "vehicles", "bookings", "bills"].forEach(entity => {
+      document.getElementById("count-" + entity).textContent = records[entity].length;
+    });
+  }
+  async function loadTable(entity) {
+const tableMap = {
+customers: 'customers',
+vehicles: 'vehicles',
+services: 'services',
+mechanics: 'mechanics',
+bookings: 'service_bookings',
+parts: 'spare_parts',
+bills: 'bills',
+payments: 'payments'
+};
+
+const tableName = tableMap[entity];
+
+if (!tableName) {
+    alert('Unknown table: ' + entity);
+    return;
+}
+
+try {
+    const response = await fetch(`/api/${tableName}`);
+
+    if (!response.ok) {
+        throw new Error('HTTP ' + response.status);
+    }
+
+    const data = await response.json();
+
+    const tbody = document.getElementById('table-' + entity);
+
+    if (!tbody) {
+        console.error('Missing table element:', 'table-' + entity);
+        return;
+    }
+
+    tbody.replaceChildren();
+
+    data.forEach(record => {
+        const row = document.createElement('tr');
+
+        (columns[entity] || Object.keys(record)).forEach(key => {
+    const cell = document.createElement("td");
+
+    cell.textContent = record[key] ?? "";
+
+    row.appendChild(cell);
+        })
+    tbody.appendChild(row);
+     });
+
+    console.log(entity + ' loaded:', data.length, 'records');
+
+} catch (error) {
+    console.error('Database loading failed:', error);
+    alert('Could not load ' + entity + '. Check the Flask terminal.');
+}
+
+}
+async function loadDashboardStats() {
+    try {
+        const response = await fetch('/api/dashboard-stats');
+        const data = await response.json();
+
+        document.getElementById('count-customers').textContent = data.customers;
+        document.getElementById('count-vehicles').textContent = data.vehicles;
+        document.getElementById('count-bookings').textContent = data.bookings;
+        document.getElementById('count-bills').textContent = data.bills;
+
+    } catch (error) {
+        console.error('Dashboard count error:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboardStats);
+
+</script>
+</body>
+</html>
+
+
+

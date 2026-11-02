@@ -1,0 +1,106 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Service Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        }
+        .login-container {
+            width: 380px;
+            max-width: 100%;
+            padding: 35px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        .logo { font-size: 45px; margin-bottom: 15px; }
+        h1 { color: #123b70; font-size: 24px; margin-bottom: 5px; }
+        .subtitle { color: #64748b; font-size: 14px; margin: 15px 0 25px; }
+        .input-group { text-align: left; margin-bottom: 18px; }
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus { border-color: #2563eb; }
+        .forgot { text-align: right; margin-bottom: 20px; }
+        .forgot a { color: #2563eb; text-decoration: none; font-size: 13px; }
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .login-btn:hover { background: #1e40af; }
+        .register { margin-top: 22px; font-size: 14px; color: #64748b; }
+        .register a { color: #2563eb; text-decoration: none; font-weight: bold; }
+        .footer { margin-top: 25px; font-size: 12px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🚗</div>
+        <h1>Vehicle Service</h1>
+        <h1>Management System</h1>
+        <p class="subtitle">Login to manage your vehicle services</p>
+
+        <form id="loginForm" action="/login" method="POST">
+            <div class="input-group">
+                <label for="userid">User ID</label>
+                <input type="text" id="userid" name="user_id"
+                       placeholder="Enter your User ID" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password"
+                       placeholder="Enter your password" required>
+            </div> 
+            
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        
+        <div class="footer">Vehicle Service Management System © 2026</div>
+    </div>
+<script>
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
